@@ -2,7 +2,11 @@ package com.OlaAniaDamian
 
 import org.apache.spark.sql.{Dataset, SparkSession}
 import org.apache.spark.sql.functions.col
+import java.io.File
+import java.io.FileInputStream
+import org.json4s.jackson.Json
 import scala.io.Source
+import scala.util.parsing.json.JSON._
 
 
 class Bayes {
@@ -14,9 +18,17 @@ class Bayes {
 
 
   def bayesData {
-    println("siemaneczko")
-
+    val stream = new FileInputStream("./src/main/resources/dane.json")
+    val source: String = Source.fromFile("./src/main/resources/dane.json").getLines.mkString
+    
+    val parsing = parseFull(source).get
+   // val parsing2 = parsing.get
+    println(parsing)
+    
+    val capitals = Map("France" -> "Paris", "Japan" -> "Tokyo")
+    println(capitals)
+    println("capitals.get( \"France\" ) : " +  capitals.get( "France" ))
+    println("capitals.get( \"India\" ) : " +  capitals.get( "India" ))
+    //val parsing2 = ms get data
   }
-
 }
-
