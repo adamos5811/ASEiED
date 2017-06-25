@@ -2,12 +2,10 @@ package com.OlaAniaDamian
 
 import org.apache.spark.sql.{Dataset, SparkSession}
 import org.apache.spark.sql.functions.col
-import java.io.File
-import java.io.FileInputStream
-import org.json4s.jackson.Json
 import scala.collection.mutable.MutableList
 import scala.io.Source
 import scala.util.parsing.json.JSON._
+import scala.math._
 
 
 class Bayes {
@@ -18,8 +16,7 @@ class Bayes {
     .getOrCreate()
 
 
-  def bayesData {
-    val stream = new FileInputStream("./src/main/resources/dane.json")
+  def bayesData(): Unit = {
     val source: String = Source.fromFile("./src/main/resources/dane.json").getLines.mkString
     val source2 = source.replaceAll("\t", "")
     val source3 = source2.replaceAll("\"", "")
@@ -49,8 +46,43 @@ class Bayes {
     print("\nx2: ")
     print(x2.mkString(", "))
     print("\ny2: ")
-    print(y2.mkString(", "))
+    println(y2.mkString(", "))
     
-
+    val closestRed = closestPoints(x1, y1)
+    val closestGreen = closestPoints(x2, y2)
+    val (newPointGreen, newPointRed) = Bayes(closestGreen.length, closestRed.length, x1.length, x2.length)
+    //println(newPointGreen, newPointRed)
+  }
+  
+  def closestPoints(x: MutableList[Int], y: MutableList[Int]): MutableList[Int] ={
+    val newX = 15
+    val newY = 30
+    val r = 22.5
+    var x_distance = 0
+    var y_distance = 0
+    var distance = 0.0
+    var closestList = new MutableList[Int]()
+    for(i <- x; j <- y){
+      x_distance = i - newX
+      y_distance = j - newY
+      distance = sqrt(pow(x_distance, 2) + pow(y_distance, 2))
+      if (distance < r)
+        closestList += i
+    }
+    
+    return closestList
+  }
+  
+  def Bayes(closestGreen: Int, closestRed: Int, amountRed: Int, amountGreen: Int): (Boolean, Boolean) = {
+    var newPointGreen = false
+    var newPointRed = false
+    val probGreen = closestGreen.toDouble / amountGreen.toDouble
+    val probRed = closestRed.toDouble / amountRed.toDouble
+    if (probGreen > probRed)
+      newPointGreen = true
+    else
+      newPointRed = true
+  
+    return (newPointGreen, newPointRed)
   }
 }
