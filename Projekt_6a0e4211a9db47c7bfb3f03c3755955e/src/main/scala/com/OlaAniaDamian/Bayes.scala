@@ -21,20 +21,29 @@ class Bayes {
     val stream = new FileInputStream("./src/main/resources/dane.json")
     val source: String = Source.fromFile("./src/main/resources/dane.json").getLines.mkString
     println("\nSource:")
-    println(source)
-    println("\nRemove tabulacje:")
     val source2 = source.toString.replaceAll("\t", "")
-    println(source2)
-    println("\nRemove \" :")
-    val source3 = source2.toString.replaceAll("\"", "")
-    println(source3)
-    println("\nRemove space :")
+    val source3 = source2.replaceAll("\"", "")
     val source4 = source3.replaceAll(" ", "")
-    println(source4)
-    val source5 = source4.toString.split("{").mkString("")
-    println("SPlit")
-    print(source5)
-    
+    val source5 = source4.replaceAll("\\[", "")
+    val source6 = source5.split(":")(2)
+    val source7 = source6.replaceAll("\\]","")
+    val source8 = source7.replaceAll("\\{","")
+    val source9 = source8.replaceAll("\\{","")
+    println(source9)
+    val data = source9.split(",")
+    println("Dane:")
+    data.foreach(print)
+    val x1 = Array[Int]()
+    val y1 = Array[Int]()
+    val x2 = Array[Int]()
+    val y2 = Array[Int]()
+    for(i <- 0 to data.length){
+      x1 :+ data(i)
+      y1 :+ data(i+1)
+      x2 :+ data(i+2)
+      y2 :+ data(i+3)
+      i += 2
+    }
     
     
 //    val source4 = source3.toString.split(' ')
@@ -46,9 +55,9 @@ class Bayes {
     println(parsing)
     val parsing2 = parsing.get
     println("Parsing2:")
-    println(parsing2)
-
     
+    
+    println("")
     println("-----Przyklad-----")
     val capitals = Map("France" -> "Paris", "Japan" -> "Tokyo")
     println(capitals)
