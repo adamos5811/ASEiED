@@ -19,14 +19,12 @@ class SortingJob {
   extrPairs.createOrReplaceTempView("pairs_view")
 
   def selectionSort: Unit = {
+    println("Selection sort start")
     val t0 = System.currentTimeMillis()
-    println("Selection sort clock started ...")
 
     val splittedPairs = sparkSession.sql("SELECT cast(data[0] as integer) as id, cast(data[1] as float) as value FROM pairs_view")
     splittedPairs.createOrReplaceTempView("source_table")
     val length = splittedPairs.count().toInt
-
-    //println(splittedPairs.rdd.getNumPartitions) //distributed parts of file amount
 
     var output_table = sparkSession.sql("SELECT * FROM source_table WHERE value=(SELECT MIN(value) FROM source_table)")
 
@@ -46,14 +44,14 @@ class SortingJob {
 
     writer.close()
     val t1 = System.currentTimeMillis()
-    println("Selection sort done. Execution time: " + (t1 - t0) + " ms")
+    println("Execution time of selection sort: " + (t1 - t0) + " ms")
 
     output_table.show()
   }
 
-  def sparkPureSort: Unit = {
+  def sparkSort: Unit = {
+    println("Spark SQL sort clock start")
     val t0 = System.currentTimeMillis()
-    println("Spark pure sort clock started ...")
     var splittedPairs = sparkSession.sql("SELECT cast(data[0] as integer) as id, cast(data[1] as float) as value FROM pairs_view ORDER BY value")
 
     val outputFile = splittedPairs.toJSON.collect()
@@ -68,14 +66,12 @@ class SortingJob {
     writer.close()
 
     val t1 = System.currentTimeMillis()
-    println("Pure spark sort done. Execution time: " + (t1 - t0) + " ms")
-
-
+    println("Spark SQL sort execution time: " + (t1 - t0) + " ms")
   }
 
   def quickSortMaint: Unit = {
     val t0 = System.currentTimeMillis()
-    println("Quick sort clock started ...")
+    println("Quick sort clock start")
     var splittedPairs = sparkSession.sql("SELECT cast(data[0] as integer) as id, cast(data[1] as float) as value FROM pairs_view")
     splittedPairs.createOrReplaceTempView("source_table")
     val len = splittedPairs.count().toInt
@@ -100,7 +96,7 @@ class SortingJob {
     writer.close()
     var dfDone = sparkSession.read.option("delimiter","|").option("header", "true").csv("./src/main/resources/quickSortOutput.csv")
     val t1 = System.currentTimeMillis()
-    println("Quick sort done. Execution time: " + (t1 - t0) + " ms")
+    println("Quick sort execution time: " + (t1 - t0) + " ms")
     dfDone.show()
     val outputFile = dfDone.toJSON.collect()
     val writer2 = new PrintWriter(new File(path + "quickSortOutput.json" ))
@@ -118,10 +114,13 @@ class SortingJob {
     var value = 0.0
   }
 
+
   def quickSort(xs: ArrayBuffer[DataType]) {
+
     def swap(i: Int, j: Int) {
       val t = xs(i); xs(i) = xs(j); xs(j) = t
     }
+
     def sorting(l: Int, r: Int) {
       val pivot = xs((l + r) / 2).value
       var i = l; var j = r
@@ -137,6 +136,7 @@ class SortingJob {
       if (l < j) sorting(l, j)
       if (j < r) sorting(i, r)
     }
+
     sorting(0, xs.length - 1)
   }
 }
