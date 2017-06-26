@@ -18,35 +18,69 @@ class SortingJob {
   val extrPairs = rawData.withColumn("data", explode(rawData.col("data"))).select("data")
   extrPairs.createOrReplaceTempView("pairs_view")
 
+  
+  def selSort(xs: ArrayBuffer[DataType], len: Int){
+    def swap(i: Int, j: Int){
+        val t = xs(i); xs(i) = xs(j); xs(j) = t
+        }
+
+    def minimal(i: Int){
+        for(j <- i until len){
+            if(xs(j).value < xs(i).value) swap(i, j)
+            }
+        }
+    
+    def sorting(){
+        for(i <- 0 until len){
+            minimal(i)
+            }
+        }
+    sorting()
+    }
+
   def selectionSort: Unit = {
+    
     println("Selection sort start")
     val t0 = System.currentTimeMillis()
 
     val splittedPairs = sparkSession.sql("SELECT cast(data[0] as integer) as id, cast(data[1] as float) as value FROM pairs_view")
     splittedPairs.createOrReplaceTempView("source_table")
     val length = splittedPairs.count().toInt
-
-    var output_table = sparkSession.sql("SELECT * FROM source_table WHERE value=(SELECT MIN(value) FROM source_table)")
-
-    for(i <- 2 until (length + 1)) {
-      sparkSession.sql("SELECT * FROM source_table ORDER BY value").limit(i).createOrReplaceTempView("tmp")
-      output_table = output_table.union(sparkSession.sql("SELECT * FROM tmp WHERE value=(SELECT MAX(value) FROM tmp)"))
+    
+    var result = splittedPairs.toDF().select("value").rdd.map(r => r(0).asInstanceOf[Float]).collect()
+    var array = ArrayBuffer[DataType]()
+    for (a <- 0 until length){
+      var obj = new DataType()
+      obj.id = a+1
+      obj.value = result(a)
+      array += obj
     }
+    selSort(array, length)
 
-    val outputFile = output_table.toJSON.collect()
     val path = "./src/main/resources/"
-    val writer = new PrintWriter(new File(path + "selectionSortOutput.json" ))
-
-    for(l <- outputFile)
+    val writer = new PrintWriter(new File(path + "selectionSortOutput.csv" ))
+    
+    writer.println("id|value")
+    for(l <- array)
     {
-      writer.println(l)
+      writer.println(l.id + "|" + l.value)
     }
 
     writer.close()
+    var dfDone = sparkSession.read.option("delimiter","|").option("header", "true").csv("./src/main/resources/selectionSortOutput.csv")
+    
     val t1 = System.currentTimeMillis()
     println("Execution time of selection sort: " + (t1 - t0) + " ms")
+    dfDone.show()
+   val outputFile = dfDone.toJSON.collect()
+    val writer2 = new PrintWriter(new File(path + "selectionSortOutput.json" ))
 
-    output_table.show()
+    for(l <- outputFile)
+    {
+      writer2.println(l)
+    }
+
+    writer2.close()
   }
 
   def sparkSort: Unit = {
