@@ -8,6 +8,7 @@ import scala.util.parsing.json.JSON._
 import scala.math._
 import scalax.chart.api._
 import scalax.chart.module.Charting
+
 class Bayes {
 
   val sparkSession = SparkSession.builder.
@@ -54,15 +55,12 @@ class Bayes {
     val (newPointGreen, newPointRed) = Bayes(closestGreen.length, closestRed.length, x1.length, x2.length)
     println(newPointGreen, newPointRed)
     
-
     val data1 = for (i <- 1 to 5) yield (i,i)
     val chart = XYLineChart(data1)
     chart.plot.setRenderer(new org.jfree.chart.renderer.xy.XYLineAndShapeRenderer(false, true))
     chart.saveAsPNG("./src/main/resources/chart.png")
     chart.show()
     Thread.sleep(5000)
-
-    
   }
   
   def closestPoints(x: MutableList[Int], y: MutableList[Int]): MutableList[Int] ={
@@ -87,9 +85,14 @@ class Bayes {
   def Bayes(closestGreen: Int, closestRed: Int, amountRed: Int, amountGreen: Int): (Boolean, Boolean) = {
     var newPointGreen = false
     var newPointRed = false
+    val allPoints = amountRed + amountGreen
+    val aprioriGreen = amountGreen / allPoints
+    val aprioriRed = amountRed / allPoints
     val probGreen = closestGreen.toDouble / amountGreen.toDouble
     val probRed = closestRed.toDouble / amountRed.toDouble
-    if (probGreen > probRed)
+    val aposterioriGreen = aprioriGreen * probGreen
+    val aposterioriRed = aprioriRed * probRed
+    if (aposterioriGreen > aposterioriRed)
       newPointGreen = true
     else
       newPointRed = true
