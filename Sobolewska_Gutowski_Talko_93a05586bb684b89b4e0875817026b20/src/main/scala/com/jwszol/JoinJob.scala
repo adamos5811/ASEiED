@@ -18,6 +18,9 @@ import scala.util.Random
 import org.apache.log4j.{Level, Logger}
 
 object NaiveBayesExample {
+    
+
+    val FIELDSIZE = 10
 
     def consoleCleaner: Unit = { //dzieki temu nie bedziemy widziec za duzo wiadomosci w konsoli
         Logger.getLogger("org").setLevel(Level.OFF)
@@ -30,6 +33,8 @@ object NaiveBayesExample {
     val conf = new SparkConf().setMaster("local[2]") 
                     .setAppName("NaiveBayes")
     val sc = new SparkContext(conf)
+
+    val sparkSession = SparkSession.builder.getOrCreate()
 
     val sqlContext = new org.apache.spark.sql.SQLContext(sc) //tworzymy context do operacji sql na danych
 
@@ -45,7 +50,7 @@ object NaiveBayesExample {
     val punkty2y = sqlContext.sql("SELECT cast(data[3] as integer) as y FROM pairs_view")
 
     var bluePoints: ArrayBuffer[Point] = new ArrayBuffer[Point]()
-    var redPoints: ArrayBuffer[Point] = new ArrayBuffer[Point]()
+    var yellowPoints: ArrayBuffer[Point] = new ArrayBuffer[Point]()
     var pktx1 = punkty1x.collect()
     var pktx2 = punkty2x.collect()
     var pkty1 = punkty1y.collect()
@@ -55,10 +60,44 @@ object NaiveBayesExample {
     {
         var bluePoint = new Point(pktx1(i).getInt(0), pkty1(i).getInt(0), Color.BLUE) //dodajemy kazdy punkt do ArrayBuffer
         //println("Dodano do niebieskich: " + pktx1(i).getInt(0) + " " +pkty1(i).getInt(0))
-        var redPoint = new Point(pktx2(i).getInt(0), pkty2(i).getInt(0), Color.BLUE)
+        var yellowPoint = new Point(pktx2(i).getInt(0), pkty2(i).getInt(0), Color.YELLOW)
         bluePoints += bluePoint
-        redPoints += redPoint
+        yellowPoints += yellowPoint
     }
+
+    var addedPoints: ArrayBuffer[Point] = new ArrayBuffer[Point]()
+
+    val randomGenerator = Random
+    for (i <- 0 to 9) {
+        val point = new Point(randomGenerator.nextInt(40), randomGenerator.nextInt(40), Color.BLACK)
+        addedPoints += point
+        val blueRDD = sparkSession.sparkContext.parallelize(bluePoints)
+        val blueInR = blueRDD.filter(p => math.pow(point.x - p.x, 2) + math.pow(point.y - p.y, 2) < math.pow(FIELDSIZE, 2))
+
+        val yellowRDD = sparkSession.sparkContext.parallelize(yellowPoints)
+        val yellowInR = yellowRDD.filter(p => math.pow(point.x - p.x, 2) + math.pow(point.y - p.y, 2) < math.pow(FIELDSIZE, 2))
+
+        val numberOfAllPoints = blueRDD.count() + yellowRDD.count()
+
+        val blueApriori = blueRDD.count().toDouble / numberOfAllPoints.toDouble
+        val yellowApriori = yellowRDD.count().toDouble / numberOfAllPoints.toDouble
+
+        val blueChance = blueInR.count().toDouble / blueRDD.count().toDouble
+        val yellowChance = yellowInR.count().toDouble / yellowRDD.count().toDouble
+
+        val blueAposteriori = blueApriori * blueChance
+        val yellowAposteriori = yellowApriori * yellowChance
+
+        if (blueAposteriori > yellowAposteriori) {
+          point.color = Color.BLUE
+          bluePoints += point
+        }
+        else if (yellowAposteriori > blueAposteriori) {
+          point.color = Color.YELLOW
+          yellowPoints += point
+        }
+    }
+
 
     sc.stop()
 
