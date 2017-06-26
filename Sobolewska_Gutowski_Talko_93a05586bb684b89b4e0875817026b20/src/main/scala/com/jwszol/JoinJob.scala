@@ -67,20 +67,21 @@ object NaiveBayesExample {
 
     var addedPoints: ArrayBuffer[Point] = new ArrayBuffer[Point]()
 
+    val blueRDD = sparkSession.sparkContext.parallelize(bluePoints)
+    val yellowRDD = sparkSession.sparkContext.parallelize(yellowPoints)
+    
+    val numberOfAllPoints = blueRDD.count() + yellowRDD.count()
     val randomGenerator = Random
+
+    val blueApriori = blueRDD.count().toDouble / numberOfAllPoints.toDouble
+    val yellowApriori = yellowRDD.count().toDouble / numberOfAllPoints.toDouble
+
     for (i <- 0 to 9) {
-        val point = new Point(randomGenerator.nextInt(40), randomGenerator.nextInt(40), Color.BLACK)
+        val point = new Point(randomGenerator.nextInt(40), randomGenerator.nextInt(40), Color.PINK)
         addedPoints += point
-        val blueRDD = sparkSession.sparkContext.parallelize(bluePoints)
-        val blueInR = blueRDD.filter(p => math.pow(point.x - p.x, 2) + math.pow(point.y - p.y, 2) < math.pow(FIELDSIZE, 2))
-
-        val yellowRDD = sparkSession.sparkContext.parallelize(yellowPoints)
-        val yellowInR = yellowRDD.filter(p => math.pow(point.x - p.x, 2) + math.pow(point.y - p.y, 2) < math.pow(FIELDSIZE, 2))
-
-        val numberOfAllPoints = blueRDD.count() + yellowRDD.count()
-
-        val blueApriori = blueRDD.count().toDouble / numberOfAllPoints.toDouble
-        val yellowApriori = yellowRDD.count().toDouble / numberOfAllPoints.toDouble
+        
+        val blueInR = blueRDD.filter(p => math.sqrt(math.pow(point.x - p.x, 2) + math.pow(point.y - p.y, 2)) < FIELDSIZE)
+        val yellowInR = yellowRDD.filter(p => math.sqrt(math.pow(point.x - p.x, 2) + math.pow(point.y - p.y, 2)) < FIELDSIZE)
 
         val blueChance = blueInR.count().toDouble / blueRDD.count().toDouble
         val yellowChance = yellowInR.count().toDouble / yellowRDD.count().toDouble
