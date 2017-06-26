@@ -42,10 +42,13 @@ object NaiveBayesExample {
     val extractedData = rawData.withColumn("data", explode(rawData.col("data"))).select("data")
     extractedData.createOrReplaceTempView("pairs_view")
 
-    val punkty1 = sqlContext.sql("SELECT cast(data[0] as float) as x, cast(data[1] as float) as y FROM pairs_view").cache() //ladujemy punkty
-    val punkty2 = sqlContext.sql("SELECT cast(data[2] as float) as x, cast(data[3] as float) as y FROM pairs_view").cache()
-    punkty2.show(10)
+    val punkty1x = sqlContext.sql("SELECT cast(data[0] as float) as x FROM pairs_view").cache() //ladujemy punkty
+    val punkty1y = sqlContext.sql("SELECT cast(data[1] as float) as y FROM pairs_view").cache()
+    val punkty2x = sqlContext.sql("SELECT cast(data[2] as float) as x FROM pairs_view").cache()
+    val punkty2y = sqlContext.sql("SELECT cast(data[3] as float) as y FROM pairs_view").cache()
     
+    punkty1x.collect().foreach(println) //collect daje nam dostep do punktow
+
     // Split data into training (60%) and test (40%).
 
     val Array(training, test) = data.randomSplit(Array(0.6, 0.4))
