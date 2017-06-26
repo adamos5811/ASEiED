@@ -1,13 +1,19 @@
 package com.jwszol
 
-import org.apache.spark.{SparkConf, SparkContext}
 
 // $example on$
 
 import org.apache.spark.mllib.classification.{NaiveBayes, NaiveBayesModel}
 
 import org.apache.spark.mllib.util.MLUtils.loadLibSVMFile
-
+import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.sql
+import org.apache.spark.sql.{Dataset, SparkSession}
+import org.apache.spark.sql.functions.col
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions.explode
+import org.apache.spark.sql.Column
+import org.apache.spark.sql.functions._
 // $example off$
 
 
@@ -16,19 +22,30 @@ object NaiveBayesExample {
 
   def main(args: Array[String]): Unit = {
 
+   
+
 
     val conf = new SparkConf().setMaster("local[2]") 
                     .setAppName("NaiveBayesExample")
     val sc = new SparkContext(conf)
 
+    val sqlContext = new org.apache.spark.sql.SQLContext(sc) //tworzymy context do operacji sql na danych
     // $example on$
 
     // Load and parse the data file.
 
     val data = loadLibSVMFile(sc, "./src/main/resources/sample_libsvm_data.txt")
 
+    val path = "./src/main/resources/dataMay-31-2017.json" //wczytywanie json
+    val MapPartRDD = sc.wholeTextFiles(path).values
+    val rawData = sqlContext.read.json(MapPartRDD)
+    val extractedData = rawData.withColumn("data", explode(rawData.col("data"))).select("data")
+    extractedData.createOrReplaceTempView("pairs_view")
 
-
+    val punkty1 = sqlContext.sql("SELECT cast(data[0] as float) as x, cast(data[1] as float) as y FROM pairs_view").cache() //ladujemy punkty
+    val punkty2 = sqlContext.sql("SELECT cast(data[2] as float) as x, cast(data[3] as float) as y FROM pairs_view").cache()
+    punkty2.show(10)
+    
     // Split data into training (60%) and test (40%).
 
     val Array(training, test) = data.randomSplit(Array(0.6, 0.4))

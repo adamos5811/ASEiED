@@ -47,7 +47,6 @@
             <version>1.6.3</version>
             <scope>provided</scope>
         </dependency>
-
     </dependencies>
 
 
