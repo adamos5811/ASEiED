@@ -20,7 +20,7 @@ class Name {
 	val joinDs = df.join(df2, df.col("name").equalTo(df2.col("name2")) && df.col("id").notEqual(df2.col("id2")), "left")
 	joinDs.createOrReplaceTempView("names")
 	//joinDs.show()
-	sparkSession.sql("select distinct name, count(name) from names group by name").show()
+	sparkSession.sql("select distinct name, count(name) / round(sqrt(count(name))) from names group by name").show()
 
   }
 
