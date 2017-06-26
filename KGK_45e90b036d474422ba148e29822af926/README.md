@@ -25,7 +25,7 @@ Następnie wczytujemy dane i wykonujemy operacje zawarte w treści zadania:
   
  Wyniki powyższych działań zapisane są do odpowiednich plików tekstowych w folderze "resources".
  
- Przygotowywany jest także plik potrzebny do przygotowania wykresu występowania określonych imion w danej lokalizacji ("wynik.txt"), w którym jest lista zawierająca [imię, miasto, liczbę osób o tym imieniu w tym mieście].
+ Przygotowywany jest także plik potrzebny do przygotowania wykresu występowania określonych imion w danej lokalizacji ("wynik.txt"), w którym jest lista zawierająca [miasto, imię, liczbę osób o tym imieniu w tym mieście].
  
  Na podstawie tego pliku dostępny skrypt Pythonowy tworzy wykres przedstawający te dane.
  
