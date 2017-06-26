@@ -1,9 +1,5 @@
 package com.jwszol
 
-
-import org.apache.spark.mllib.classification.{NaiveBayes, NaiveBayesModel}
-
-import org.apache.spark.mllib.util.MLUtils.loadLibSVMFile
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql
 import org.apache.spark.sql.{Dataset, SparkSession}
@@ -17,19 +13,19 @@ import org.apache.spark.mllib.regression.LabeledPoint
 import scala.collection.mutable.ArrayBuffer
 
 import java.awt._
-import java.awt.geom._
-import java.awt.image.BufferedImage
-import javax.swing.{ImageIcon, JOptionPane}
 
-
-
+import scala.util.Random
+import org.apache.log4j.{Level, Logger}
 
 object NaiveBayesExample {
 
+    def consoleCleaner: Unit = { //dzieki temu nie bedziemy widziec za duzo wiadomosci w konsoli
+        Logger.getLogger("org").setLevel(Level.OFF)
+        Logger.getLogger("akka").setLevel(Level.OFF)
+    }
   def main(args: Array[String]): Unit = {
 
-   
-
+    consoleCleaner //usuwamy niepotrzebne wiadomosci
 
     val conf = new SparkConf().setMaster("local[2]") 
                     .setAppName("NaiveBayes")
@@ -58,15 +54,11 @@ object NaiveBayesExample {
     for(i <- 0 to pktx1.length - 1)
     {
         var bluePoint = new Point(pktx1(i).getInt(0), pkty1(i).getInt(0), Color.BLUE) //dodajemy kazdy punkt do ArrayBuffer
+        //println("Dodano do niebieskich: " + pktx1(i).getInt(0) + " " +pkty1(i).getInt(0))
         var redPoint = new Point(pktx2(i).getInt(0), pkty2(i).getInt(0), Color.BLUE)
         bluePoints += bluePoint
         redPoints += redPoint
     }
-
-    
-    // Split data into training (60%) and test (40%).
-
-    val Array(training, test) = data.randomSplit(Array(0.6, 0.4))
 
     sc.stop()
 
