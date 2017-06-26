@@ -71,7 +71,7 @@ class Bayes {
     var y_distance = 0
     var distance = 0.0
     var closestList = new MutableList[Int]()
-    for(i <- x; j <- y){
+    for ((i, j) <- (x zip y)){
       x_distance = i - newX
       y_distance = j - newY
       distance = sqrt(pow(x_distance, 2) + pow(y_distance, 2))
