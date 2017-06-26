@@ -49,23 +49,43 @@ class Bayes {
     print(x2.mkString(", "))
     print("\ny2: ")
     println(y2.mkString(", "))
-    
-    val closestRed = closestPoints(x1, y1)
-    val closestGreen = closestPoints(x2, y2)
-    val (newPointGreen, newPointRed) = Bayes(closestGreen.length, closestRed.length, x1.length, x2.length)
-    println(newPointGreen, newPointRed)
-    
-    val data1 = for (i <- 1 to 5) yield (i,i)
-    val chart = XYLineChart(data1)
-    chart.plot.setRenderer(new org.jfree.chart.renderer.xy.XYLineAndShapeRenderer(false, true))
-    chart.saveAsPNG("./src/main/resources/chart.png")
-    chart.show()
-    Thread.sleep(5000)
-  }
-  
-  def closestPoints(x: MutableList[Int], y: MutableList[Int]): MutableList[Int] ={
     val newX = 15
     val newY = 30
+    val closestRed = closestPoints(x1, y1, newX, newY)
+    val closestGreen = closestPoints(x2, y2,  newX, newY)
+    val (newPointGreen, newPointRed) = Bayes(closestGreen.length, closestRed.length, x1.length, x2.length)
+    println(newPointGreen, newPointRed)
+    if(newPointRed) {
+        x1+=newX
+        y1+=newY
+    }
+    else {
+      x2+=newX
+      y2+=newY
+    }    
+    val series = new XYSeries("Class 1")
+        for ((a,b) <- x1 zip y1) {
+          swing.Swing onEDT {
+          series.add(a,b)
+        }
+    }
+    val series2 = new XYSeries("Class 2")
+        for ((a,b) <- x2 zip y2) {
+          swing.Swing onEDT {
+          series2.add(a,b)
+        }
+    }
+  
+    val SeriesColl = new XYSeriesCollection()
+    SeriesColl.addSeries(series)
+    SeriesColl.addSeries(series2)
+    val chart1 = XYLineChart(SeriesColl)
+    chart1.plot.setRenderer(new org.jfree.chart.renderer.xy.XYLineAndShapeRenderer(false, true))
+    chart1.show()
+    Thread.sleep(50000)
+  }
+  
+  def closestPoints(x: MutableList[Int], y: MutableList[Int], newX: Int, newY: Int): MutableList[Int] ={
     val r = 18.5
     var x_distance = 0
     var y_distance = 0
