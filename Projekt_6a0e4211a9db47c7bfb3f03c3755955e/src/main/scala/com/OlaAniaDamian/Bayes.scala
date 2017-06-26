@@ -66,7 +66,7 @@ class Bayes {
   def closestPoints(x: MutableList[Int], y: MutableList[Int]): MutableList[Int] ={
     val newX = 15
     val newY = 30
-    val r = 22.5
+    val r = 18.5
     var x_distance = 0
     var y_distance = 0
     var distance = 0.0
@@ -86,12 +86,13 @@ class Bayes {
     var newPointGreen = false
     var newPointRed = false
     val allPoints = amountRed + amountGreen
-    val aprioriGreen = amountGreen / allPoints
-    val aprioriRed = amountRed / allPoints
+    val aprioriGreen = amountGreen.toDouble / allPoints.toDouble
+    val aprioriRed = amountRed.toDouble / allPoints.toDouble
     val probGreen = closestGreen.toDouble / amountGreen.toDouble
     val probRed = closestRed.toDouble / amountRed.toDouble
     val aposterioriGreen = aprioriGreen * probGreen
     val aposterioriRed = aprioriRed * probRed
+
     if (aposterioriGreen > aposterioriRed)
       newPointGreen = true
     else
