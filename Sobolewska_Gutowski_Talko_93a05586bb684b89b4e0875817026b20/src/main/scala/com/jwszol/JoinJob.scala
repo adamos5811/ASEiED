@@ -20,7 +20,7 @@ import org.apache.log4j.{Level, Logger}
 object NaiveBayesExample {
     
 
-    val FIELDSIZE = 10
+    
 
     def consoleCleaner: Unit = { //dzieki temu nie bedziemy widziec za duzo wiadomosci w konsoli
         Logger.getLogger("org").setLevel(Level.OFF)
@@ -76,26 +76,47 @@ object NaiveBayesExample {
     val blueApriori = blueRDD.count().toDouble / numberOfAllPoints.toDouble
     val yellowApriori = yellowRDD.count().toDouble / numberOfAllPoints.toDouble
 
-    for (i <- 0 to 9) {
-        val point = new Point(randomGenerator.nextInt(40), randomGenerator.nextInt(40), Color.PINK)
-        addedPoints += point
-        
-        val blueInR = blueRDD.filter(p => math.sqrt(math.pow(point.x - p.x, 2) + math.pow(point.y - p.y, 2)) < FIELDSIZE)
-        val yellowInR = yellowRDD.filter(p => math.sqrt(math.pow(point.x - p.x, 2) + math.pow(point.y - p.y, 2)) < FIELDSIZE)
+    println("blue " + blueApriori + "     yellow " + yellowApriori)
+    //println("blueInR " + blueInR.count() + "     yellowInR " + yellowInR.count())
+    println()
 
+    for (i <- 0 to 9) {
+
+        var FIELDSIZE = 7
+        var found = 0
+        val point = new Point(randomGenerator.nextInt(40), randomGenerator.nextInt(40), Color.PINK)
+        var blueInR = blueRDD.filter(p => math.sqrt(math.pow(point.x - p.x, 2) + math.pow(point.y - p.y, 2)) < FIELDSIZE)
+        var yellowInR = yellowRDD.filter(p => math.sqrt(math.pow(point.x - p.x, 2) + math.pow(point.y - p.y, 2)) < FIELDSIZE)
+        addedPoints += point
+        while(found<5)
+        {
+        blueInR = blueRDD.filter(p => math.sqrt(math.pow(point.x - p.x, 2) + math.pow(point.y - p.y, 2)) < FIELDSIZE)
+        yellowInR = yellowRDD.filter(p => math.sqrt(math.pow(point.x - p.x, 2) + math.pow(point.y - p.y, 2)) < FIELDSIZE)
+        found = blueInR.count().toInt + yellowInR.count().toInt
+        FIELDSIZE+=1
+        }
         val blueChance = blueInR.count().toDouble / blueRDD.count().toDouble
         val yellowChance = yellowInR.count().toDouble / yellowRDD.count().toDouble
-
+        
+        
         val blueAposteriori = blueApriori * blueChance
         val yellowAposteriori = yellowApriori * yellowChance
+
+        println("blueApost " + blueAposteriori + "     yellowApost " + yellowAposteriori)
+        println("blueInR " + blueInR.count() + "     yellowInR " + yellowInR.count())
+        println()
 
         if (blueAposteriori > yellowAposteriori) {
           point.color = Color.BLUE
           bluePoints += point
+          println("blue")
+          println()
         }
         else if (yellowAposteriori > blueAposteriori) {
           point.color = Color.YELLOW
           yellowPoints += point
+          println("yellow")
+          println()
         }
     }
 
