@@ -1,0 +1,96 @@
+Hinckley|3
+San Diego|2
+Colchester|2
+Springfield|1
+Flénu|1
+Linz|1
+Bhind|1
+Dipignano|1
+CarapicuÌba|1
+Brahmapur|1
+Lagonegro|1
+Louisville|1
+Greifswald|1
+Bargagli|1
+Boulogne-sur-Mer|1
+Fiumara|1
+Cuceglio|1
+Woking|1
+Flint|1
+LÈvis|1
+Bridgeport|1
+Mejillones|1
+Santa Fiora|1
+Louveigné|1
+Randazzo|1
+Kilmarnock|1
+Grivegnée|1
+Frankfort|1
+Avennes|1
+Quilicura|1
+Mundare|1
+Bridlington|1
+Villenave-d'Ornon|1
+Zonhoven|1
+Isla de Maipo|1
+Pe?aflor|1
+CzÍstochowa|1
+Ashburton|1
+Neu-Isenburg|1
+Geraldton-Greenough|1
+Dreieich|1
+Paisley|1
+Capannori|1
+Lawton|1
+Lakewood|1
+Vaux-sous-Chévremont|1
+Terni|1
+Crowsnest Pass|1
+West Jordan|1
+Ercilla|1
+Aliano|1
+Campochiaro|1
+Stintino|1
+Canora|1
+Portofino|1
+Trois-Rivi?res|1
+Dawson Creek|1
+Honolulu|1
+Tuscaloosa|1
+Piétrebais|1
+Ternat|1
+Peterhead|1
+Saint-Brieuc|1
+Baiso|1
+High Wycombe|1
+Nakusp|1
+New Haven|1
+Kitchener|1
+Watermaal-Bosvoorde|1
+Minto|1
+Hameln|1
+Fiuminata|1
+Montone|1
+Marke|1
+Berceto|1
+Zutphen|1
+Bangor|1
+Céroux-Mousty|1
+Arvier|1
+Zaria|1
+Portree|1
+Valkenburg aan de Geul|1
+Morro Reatino|1
+Prestatyn|1
+Oxford County|1
+Warwick|1
+Sindelfingen|1
+South Portland|1
+Rajahmundry|1
+Ofena|1
+Lethbridge|1
+Silvassa|1
+Minervino di Lecce|1
+Roermond|1
+Woodlands County|1
+Minderhout|1
