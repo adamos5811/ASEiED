@@ -9,8 +9,8 @@ class KmeansTest extends FunSpec with GivenWhenThen {
   Logger.getLogger("akka").setLevel(Level.OFF)
 
   describe("KmeansTest") {
-    val sj = new Kmeans
-    sj.k_mean
+    //val sj = new Kmeans
+    //sj.k_mean
 
   }
 
