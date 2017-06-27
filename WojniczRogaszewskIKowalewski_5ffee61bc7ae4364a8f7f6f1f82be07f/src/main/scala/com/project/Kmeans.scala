@@ -6,7 +6,9 @@ import scala.collection.mutable.ArrayBuffer
 import scala.collection.mutable.Map
 import scala.util._
 import scala.io.StdIn.readLine
-
+import scalax.chart.api._
+import scalax.chart.module._
+//import scalax.
 class Kmeans {
 
   val sparkSession = SparkSession.builder.
@@ -30,6 +32,8 @@ class Kmeans {
     var x1 = splittedPairs.toDF().select("x1").rdd.map(r => r(0).asInstanceOf[Int]).collect()
     var y1 = splittedPairs.toDF().select("y1").rdd.map(r => r(0).asInstanceOf[Int]).collect()
     
+    
+    
     var points = ArrayBuffer[Point]()
     for (i <- 0 until len) {
       var pt = new Point()
@@ -39,12 +43,13 @@ class Kmeans {
     }
 
     //losowe punkty
-    println("Wpisz ilosc punktow k: ")
+    println("Wpisz liczbe punktow k: ")
     //val test = readLine()
+    var n = 3 //= scala.io.StdIn.readInt()
     //printf("You typed: %s", test)
     println()
     println("K-mean started ...")
-    var n = 3
+    
     var k_points = ArrayBuffer[Point]()
     val r = Random
     for (i <- 0 until n) {
@@ -57,11 +62,43 @@ class Kmeans {
     
     println("K-mean started ...")
     kMeanAlg(points, k_points)
-    
+    //var colorlists = Array[Point](20)
     for (i <- 0 until len) {
       println(points(i).x + ", " + points(i).y + " | group: " + points(i).group)
+      //colorlists(points(i).group).
     }
+    val series1 = new XYSeries("Series 1")
+    val series2 = new XYSeries("Series 2")
+    val series3 = new XYSeries("Series 3")
+
     
+    for (i <- 0 until len){
+        if (points(i).group == 1)
+            series1.add(points(i).x, points(i).y)
+        if (points(i).group == 2)
+            series2.add(points(i).x, points(i).y)
+        if (points(i).group == 3)
+            series3.add(points(i).x, points(i).y)
+    }
+
+    val SeriesColl = new  XYSeriesCollection()
+    SeriesColl.addSeries(series1)
+    SeriesColl.addSeries(series2)
+    SeriesColl.addSeries(series3)
+    
+    val chart = XYLineChart(SeriesColl)
+    //val data = for (i <- 1 to 5) yield (i,i)
+    //val chartxy = XYLineChart(data)
+
+    chart.plot.setRenderer(new org.jfree.chart.renderer.xy.XYLineAndShapeRenderer(false, true))
+    chart.plot.getRenderer().setSeriesPaint(1, new Color(0x00, 0xFF, 0x00))
+    chart.plot.getRenderer().setSeriesPaint(0, new Color(0xFF, 0x00, 0x00))
+    chart.plot.getRenderer().setSeriesPaint(2, new Color(0xFF, 0xFF, 0x00))
+
+    chart.plot.setBackgroundPaint(new Color(0xFF, 0xFF, 0xFF))
+    //chartxy.show()
+    println("Saving chart")
+    chartxy.saveAsPNG("chart.png")
   }
 
   def clearGroup(list: ArrayBuffer[Point]) {
