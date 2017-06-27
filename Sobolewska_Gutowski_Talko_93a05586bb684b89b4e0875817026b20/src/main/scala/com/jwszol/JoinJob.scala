@@ -65,7 +65,7 @@ object NaiveBayesExample {
         bluePoints += bluePoint
         yellowPoints += yellowPoint
     }
-
+    
     var addedPoints: ArrayBuffer[Point] = new ArrayBuffer[Point]()
 
     val blueRDD = sparkSession.sparkContext.parallelize(bluePoints)
@@ -80,7 +80,9 @@ object NaiveBayesExample {
     println("blue " + blueApriori + "     yellow " + yellowApriori)
     //println("blueInR " + blueInR.count() + "     yellowInR " + yellowInR.count())
     println()
-
+    
+    var blueNewPoints: ArrayBuffer[Point] = new ArrayBuffer[Point]()
+    var yellowNewPoints: ArrayBuffer[Point] = new ArrayBuffer[Point]()
     for (i <- 0 to 9) {
 
         var FIELDSIZE = 7
@@ -109,13 +111,13 @@ object NaiveBayesExample {
 
         if (blueAposteriori > yellowAposteriori) {
           point.color = Color.BLUE
-          bluePoints += point
+          blueNewPoints += point
           println("blue")
           println()
         }
         else if (yellowAposteriori > blueAposteriori) {
           point.color = Color.YELLOW
-          yellowPoints += point
+          yellowNewPoints += point
           println("yellow")
           println()
         }
@@ -126,18 +128,30 @@ object NaiveBayesExample {
     val blueSeries = new XYSeries("Klasa 2")
     for((myPoint,i) <- bluePoints.view.zipWithIndex) blueSeries.add(myPoint.x,myPoint.y )
     
+    val yellowNewSeries = new XYSeries("Klasa 1 kwalifikacja")
+    for((myPoint,i) <- yellowNewPoints.view.zipWithIndex) yellowNewSeries.add(myPoint.x,myPoint.y )
+    
+    val blueNewSeries = new XYSeries("Klasa 2 kwalifikacja")
+    for((myPoint,i) <- blueNewPoints.view.zipWithIndex) blueNewSeries.add(myPoint.x,myPoint.y )
+    
+    
+    
 
     val SeriesColl = new XYSeriesCollection()
     SeriesColl.addSeries(yellowSeries)
     SeriesColl.addSeries(blueSeries)
+    SeriesColl.addSeries(yellowNewSeries)
+    SeriesColl.addSeries(blueNewSeries)
+    
     
     val chart = XYLineChart(SeriesColl)
     
-    
+  
     chart.plot.setRenderer(new org.jfree.chart.renderer.xy.XYLineAndShapeRenderer(false, true))
     chart.plot.getRenderer().setSeriesPaint(0, Color.YELLOW)
     chart.plot.getRenderer().setSeriesPaint(1, Color. BLUE)
-
+    chart.plot.getRenderer().setSeriesPaint(2, new Color(204,204,0))//dark yellow
+    chart.plot.getRenderer().setSeriesPaint(3, Color.CYAN)
 
     chart.show()
     Thread.sleep(500000)
