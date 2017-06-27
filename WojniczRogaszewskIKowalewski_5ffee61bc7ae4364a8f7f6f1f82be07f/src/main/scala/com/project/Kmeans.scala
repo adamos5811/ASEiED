@@ -8,6 +8,10 @@ import scala.util._
 import scala.io.StdIn.readLine
 import scalax.chart.api._
 import scalax.chart.module._
+
+import scala.io.Source
+
+
 //import scalax.
 class Kmeans {
 
@@ -46,6 +50,18 @@ class Kmeans {
     println("Wpisz liczbe punktow k: ")
     //val test = readLine()
     var n = 3 //= scala.io.StdIn.readInt()
+
+
+    val filename = "./src/main/resources/k.txt"
+    val file = Source.fromFile(filename)
+    for (line <- file.getLines) {
+        println(line)
+        n = line.toInt
+    }
+    file.close
+    
+
+
     //printf("You typed: %s", test)
     println()
     println("K-mean started ...")
@@ -98,7 +114,7 @@ class Kmeans {
     chart.plot.setBackgroundPaint(new Color(0xFF, 0xFF, 0xFF))
     //chartxy.show()
     println("Saving chart")
-    chartxy.saveAsPNG("chart.png")
+    chart.saveAsPNG("chart.png")
   }
 
   def clearGroup(list: ArrayBuffer[Point]) {
