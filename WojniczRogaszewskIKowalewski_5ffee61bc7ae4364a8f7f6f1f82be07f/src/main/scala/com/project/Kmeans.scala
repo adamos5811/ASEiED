@@ -5,14 +5,10 @@ import java.io._
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.mutable.Map
 import scala.util._
-import scala.io.StdIn.readLine
-import scalax.chart.api._
-import scalax.chart.module._
+import scala.io.StdIn._
+import org.jfree.chart._
+import org.jfree.data.xy._
 
-import scala.io.Source
-
-
-//import scalax.
 class Kmeans {
 
   val sparkSession = SparkSession.builder.
@@ -28,15 +24,12 @@ class Kmeans {
   extractedPairs.createOrReplaceTempView("pairs_view")
 
   def k_mean: Unit = {
-    //"ls".run(true).exitValue()
     val splittedPairs = sparkSession.sql("SELECT cast(data[0] as integer) as x1, cast(data[1] as integer) as y1 FROM pairs_view")
     splittedPairs.createOrReplaceTempView("source_table")
     val len = splittedPairs.count().toInt
     
     var x1 = splittedPairs.toDF().select("x1").rdd.map(r => r(0).asInstanceOf[Int]).collect()
     var y1 = splittedPairs.toDF().select("y1").rdd.map(r => r(0).asInstanceOf[Int]).collect()
-    
-    
     
     var points = ArrayBuffer[Point]()
     for (i <- 0 until len) {
@@ -46,26 +39,9 @@ class Kmeans {
       points += pt
     }
 
-    //losowe punkty
-    println("Wpisz liczbe punktow k: ")
-    //val test = readLine()
-    var n = 3 //= scala.io.StdIn.readInt()
-
-
-    val filename = "./src/main/resources/k.txt"
-    val file = Source.fromFile(filename)
-    for (line <- file.getLines) {
-        println(line)
-        n = line.toInt
-    }
-    file.close
-    
-
-
-    //printf("You typed: %s", test)
-    println()
-    println("K-mean started ...")
-    
+    //random points
+    println("Enter the number of points k: ")
+    var n = readInt()
     var k_points = ArrayBuffer[Point]()
     val r = Random
     for (i <- 0 until n) {
@@ -78,43 +54,50 @@ class Kmeans {
     
     println("K-mean started ...")
     kMeanAlg(points, k_points)
-    //var colorlists = Array[Point](20)
+    
     for (i <- 0 until len) {
       println(points(i).x + ", " + points(i).y + " | group: " + points(i).group)
-      //colorlists(points(i).group).
     }
-    val series1 = new XYSeries("Series 1")
-    val series2 = new XYSeries("Series 2")
-    val series3 = new XYSeries("Series 3")
-
     
-    for (i <- 0 until len){
-        if (points(i).group == 1)
-            series1.add(points(i).x, points(i).y)
-        if (points(i).group == 2)
-            series2.add(points(i).x, points(i).y)
-        if (points(i).group == 3)
-            series3.add(points(i).x, points(i).y)
+    //making chart
+    val dataset = new DefaultXYDataset
+    
+      var xbuff=ArrayBuffer[Double]()
+      var ybuff=ArrayBuffer[Double]()
+    for(i<-0 until n){
+      ybuff+=k_points(i).y
+      xbuff+=k_points(i).x
     }
-
-    val SeriesColl = new  XYSeriesCollection()
-    SeriesColl.addSeries(series1)
-    SeriesColl.addSeries(series2)
-    SeriesColl.addSeries(series3)
-    
-    val chart = XYLineChart(SeriesColl)
-    //val data = for (i <- 1 to 5) yield (i,i)
-    //val chartxy = XYLineChart(data)
-
-    chart.plot.setRenderer(new org.jfree.chart.renderer.xy.XYLineAndShapeRenderer(false, true))
-    chart.plot.getRenderer().setSeriesPaint(1, new Color(0x00, 0xFF, 0x00))
-    chart.plot.getRenderer().setSeriesPaint(0, new Color(0xFF, 0x00, 0x00))
-    chart.plot.getRenderer().setSeriesPaint(2, new Color(0xFF, 0xFF, 0x00))
-
-    chart.plot.setBackgroundPaint(new Color(0xFF, 0xFF, 0xFF))
-    //chartxy.show()
-    println("Saving chart")
-    chart.saveAsPNG("chart.png")
+    val kx=xbuff.toArray
+    val ky=ybuff.toArray
+    dataset.addSeries("klastry", Array(kx,ky))
+    for (i <- 0 until n) {
+      var xbuf = ArrayBuffer[Double]()
+      var ybuf = ArrayBuffer[Double]()
+      for (j <- 0 until len){
+        if (points(j).group == k_points(i).group){
+          xbuf += points(j).x
+          ybuf += points(j).y
+        }
+      }
+      val x = xbuf.toArray
+      val y = ybuf.toArray
+      val serie = "Series " + i.toString
+      dataset.addSeries(serie, Array(x,y))
+    }
+    val frame = new ChartFrame(
+      "Title",
+      ChartFactory.createScatterPlot(
+        "Plot",
+        "X Label",
+        "Y Label",
+        dataset,
+        org.jfree.chart.plot.PlotOrientation.VERTICAL,
+        false,false,false
+      )
+    )
+    frame.pack()
+    frame.setVisible(true)
   }
 
   def clearGroup(list: ArrayBuffer[Point]) {
@@ -169,20 +152,37 @@ class Kmeans {
     }
   }
   
+  def deepCopyArray(list: ArrayBuffer[Point]): ArrayBuffer[Point] = {
+    var new_list = ArrayBuffer[Point]()
+    for (i <- 0 until list.size) {
+      var pt = new Point()
+      pt.x = list(i).x
+      pt.y = list(i).y
+      pt.group = list(i).group
+      new_list += pt
+    }
+    return new_list
+  }
+  
   def kMeanAlg(points: ArrayBuffer[Point], k_points: ArrayBuffer[Point]){
     var changeFlag = true
     
     while (changeFlag) {
-      var prev_k_points = k_points.clone
+      val prev_k_points = deepCopyArray(k_points)
+      clearGroup(points)
+      //println(prev_k_points(0).x)
+      //println(prev_k_points(0).y)
       giveGroupCollection(points, k_points)
       movePointsK(points, k_points)
-      
+      //println(prev_k_points(0).x)
+      //println(prev_k_points(0).y)
       changeFlag = false
       for (i <- 0 until k_points.size) {
-        if (Math.abs(k_points(i).x - prev_k_points(i).x) > 1 || Math.abs(k_points(i).y - prev_k_points(i).y) > 1){
+        if (Math.abs(k_points(i).x - prev_k_points(i).x) > 0 || Math.abs(k_points(i).y - prev_k_points(i).y) > 0){
           changeFlag = true
         }
       }
+      println("test")
     }
   }
   
