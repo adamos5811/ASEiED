@@ -1,4 +1,4 @@
-# Sorting data tables in scala
+# quicksort, selection sort scala
+Run:
 
-#
-To build this code you need to have maven tool
+mvn test 
