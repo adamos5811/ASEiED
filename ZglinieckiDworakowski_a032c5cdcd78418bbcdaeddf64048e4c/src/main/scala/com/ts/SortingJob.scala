@@ -19,24 +19,26 @@ class SortingJob {
   extrPairs.createOrReplaceTempView("pairs_view")
 
   
-  // def selSort(xs: ArrayBuffer[InputData], len: Int){
-  //   def swap(i: Int, j: Int){
-  //       val t = xs(i); xs(i) = xs(j); xs(j) = t
-  //       }
+  def selSort(a: ArrayBuffer[InputData]){
+    def swap(i: Int, j: Int){
+        val t = a(i)
+          a(i) = a(j)
+          a(j) = t
+        }
 
-  //   def minimal(i: Int){
-  //       for(j <- i until len){
-  //           if(xs(j).value < xs(i).value) swap(i, j)
-  //           }
-  //       }
+    def minimal(i: Int){
+        for(j <- i until a.length){
+            if(a(j).value < a(i).value) swap(i, j)
+            }
+        }
     
-  //   def sorting(){
-  //       for(i <- 0 until len){
-  //           minimal(i)
-  //           }
-  //       }
-  //   sorting()
-  //   }
+    def sorting(){
+        for(i <- 0 until a.length){
+            minimal(i)
+            }
+        }
+    sorting()
+    }
 
   def selectionSort: Unit = {
     
@@ -54,8 +56,7 @@ class SortingJob {
       obj.value = result(a)
       array += obj
     }
-    // selSort(array, length)
-    array = selSort(array)
+    selSort(array)
 
     val path = "./src/main/resources/"
     val writer = new PrintWriter(new File(path + "selectionSortOutput.csv" ))
@@ -144,53 +145,29 @@ class SortingJob {
         smaller++pivotList++bigger
     }
   
-  def selSort(a:ArrayBuffer[InputData]): ArrayBuffer[InputData] =
-    if (a.length < 2) a //jesli jeden element lub puste to zwroc
-    else {
-      var SortedSelection = a.clone()
-      for (i <- 0 to (a.length - 1)) {
-        var minvalue  = 10000000.0
-        var minId = a(0)
-        for (j <- 0 to (a.drop(i).length - 1)){
-          if(a(j).value < minvalue){
-            minvalue = a(j).value
-            minId = a(j+i)
-          }
-        }
-        // var minvalue  = SortedSelection.drop(i).min
-
-        var minIndex = SortedSelection.indexOf(minId)
-        //println(minIndex)
-        var placeholder = SortedSelection(minIndex)
-        SortedSelection(minIndex) = SortedSelection(i)
-        SortedSelection(i) = placeholder
-      }
-      // println(5)
-      SortedSelection
-    }
-
-  // def quickSort(xs: ArrayBuffer[InputData]) {
-
-  //   def swap(i: Int, j: Int) {
-  //     val t = xs(i); xs(i) = xs(j); xs(j) = t
-  //   }
-
-  //   def sorting(l: Int, r: Int) {
-  //     val pivot = xs((l + r) / 2).value
-  //     var i = l; var j = r
-  //     while (i <= j) {
-  //       while (xs(i).value < pivot) i += 1
-  //       while (xs(j).value > pivot) j -= 1
-  //       if (i <= j) {
-  //         swap(i, j)
-  //         i += 1
-  //         j -= 1
+  // def selSort(a:ArrayBuffer[InputData]): ArrayBuffer[InputData] =
+  //   if (a.length < 2) a //jesli jeden element lub puste to zwroc
+  //   else {
+  //     var SortedSelection = a.clone()
+  //     for (i <- 0 to (a.length - 1)) {
+  //       var minvalue  = 10000000.0
+  //       var minId = a(0)
+  //       for (j <- 0 to (a.drop(i).length - 1)){
+  //         if(a(j).value < minvalue){
+  //           minvalue = a(j).value
+  //           minId = a(j+i)
+  //         }
   //       }
+  //       // var minvalue  = SortedSelection.drop(i).min
+
+  //       var minIndex = SortedSelection.indexOf(minId)
+  //       //println(minIndex)
+  //       var placeholder = SortedSelection(minIndex)
+  //       SortedSelection(minIndex) = SortedSelection(i)
+  //       SortedSelection(i) = placeholder
   //     }
-  //     if (l < j) sorting(l, j)
-  //     if (j < r) sorting(i, r)
+  //     // println(5)
+  //     SortedSelection
   //   }
 
-  //   sorting(0, xs.length - 1)
-  // }
 }
