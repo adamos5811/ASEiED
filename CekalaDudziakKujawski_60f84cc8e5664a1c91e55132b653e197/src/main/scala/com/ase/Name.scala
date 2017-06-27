@@ -27,9 +27,9 @@ class Name {
         val people = sparkSession.sql("select name, city, company,(count(name)) as amount from names group by city,company,name order by amount desc")
 /**,city,company order by amount desc")*/
         people.show()
-        Thread.sleep(50000)
+        Thread.sleep(5000)
         val data0 = people.collect().toSeq
-	val data1 = for (i <- data0) yield (i(0).toString + ":" + i(1).toString + ":" + i(2).toString, i(3).asInstanceOf[Double])
+	val data1 = for (i <- data0) yield (i(0).toString + ":" + i(1).toString + ":" + i(2).toString, i(3).asInstanceOf[Long])
     val chart = PieChart(data1)
     chart.saveAsPNG("./src/main/resources/chart.png")
     chart.show()
