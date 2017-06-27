@@ -13,6 +13,7 @@ import org.apache.spark.mllib.regression.LabeledPoint
 import scala.collection.mutable.ArrayBuffer
 
 import java.awt._
+import scalax.chart.api._
 
 import scala.util.Random
 import org.apache.log4j.{Level, Logger}
@@ -119,7 +120,27 @@ object NaiveBayesExample {
           println()
         }
     }
+    val yellowSeries = new XYSeries("Klasa 1")
+    for((myPoint,i) <- yellowPoints.view.zipWithIndex) yellowSeries.add(myPoint.x,myPoint.y )
+    
+    val blueSeries = new XYSeries("Klasa 2")
+    for((myPoint,i) <- bluePoints.view.zipWithIndex) blueSeries.add(myPoint.x,myPoint.y )
+    
 
+    val SeriesColl = new XYSeriesCollection()
+    SeriesColl.addSeries(yellowSeries)
+    SeriesColl.addSeries(blueSeries)
+    
+    val chart = XYLineChart(SeriesColl)
+    
+    
+    chart.plot.setRenderer(new org.jfree.chart.renderer.xy.XYLineAndShapeRenderer(false, true))
+    chart.plot.getRenderer().setSeriesPaint(0, Color.YELLOW)
+    chart.plot.getRenderer().setSeriesPaint(1, Color. BLUE)
+
+
+    chart.show()
+    Thread.sleep(500000)
 
     sc.stop()
 
